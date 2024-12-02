@@ -329,7 +329,6 @@ def produtos_cadastrados():
         st.dataframe(df)
     else:
         st.write("Nenhum produto cadastrado.")
-import plotly.express as px
 
 # Planilha de clientes
 def planilha_clientes():
