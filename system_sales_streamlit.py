@@ -465,14 +465,22 @@ def planilha_clientes():
 
     # Fechar conexão
     conn.close()
+
 # Função principal do Dashboard
 def dashboard():
+    # Função para criar cartões estilizados
+    def create_card(title, value, color="#1f77b4"):
+        return f"""
+        <div style="background-color:{color}; padding:20px; border-radius:15px; text-align:center; box-shadow:0 4px 6px rgba(0, 0, 0, 0.1); margin-bottom:20px;">
+            <h3 style="color:white; font-size:22px; margin-bottom:10px;">{title}</h3>
+            <p style="font-size:28px; font-weight:bold; color:white;">{value}</p>
+        </div>"""
     # Configurar tela em 100% apenas no Dashboard
 
     st.title("Dashboard de Indicadores")
 
     # Filtro por período
-    st.sidebar.header("Filtros")
+    st.sidebar.header("🔎 Filtros")
     data_inicio = st.sidebar.date_input("Data Início", datetime.now() - timedelta(days=30))
     data_fim = st.sidebar.date_input("Data Fim", datetime.now())
     
@@ -509,15 +517,23 @@ def dashboard():
 
     # Exibição de Indicadores
     col1, col2, col3, col4 = st.columns(4)
-    col1.metric("Produtos Cadastrados", total_produtos)
-    col2.metric("Clientes Cadastrados", total_clientes)
-    col3.metric("Profissionais Cadastrados", total_profissionais)
-    col4.metric("Faturamento Total", f"R$ {total_faturamento:.2f}" if total_faturamento else "R$ 0,00")
+    with col1:
+        st.markdown(create_card("Produtos Cadastrados", total_produtos, "#1f77b4"), unsafe_allow_html=True)
+
+    with col2:
+        st.markdown(create_card("Clientes Cadastrados", total_clientes, "#1f77b4"), unsafe_allow_html=True)
+
+    with col3:
+        st.markdown(create_card("Profissionais Cadastrados", total_profissionais, "#1f77b4"), unsafe_allow_html=True)
+
+    with col4:
+        st.markdown(create_card("Faturamento Total", f"R$ {total_faturamento:.2f}" if total_faturamento else "R$ 0,00", "#1f77b4"), unsafe_allow_html=True)
 
     col5, col6 = st.columns(2)
-    col5.metric("Total de Produtos Vendidos", total_produtos_vendidos if total_produtos_vendidos else 0)
-    col6.metric("Total de Produtos Comprados", total_produtos_comprados if total_produtos_comprados else 0)
-
+    with col5:
+        st.markdown(create_card("Total de Produtos Vendidos", total_produtos_vendidos if total_produtos_vendidos else 0, "#1f77b4"), unsafe_allow_html=True)
+    with col6:
+        st.markdown(create_card("Total de Produtos Comprados", total_produtos_comprados if total_produtos_comprados else 0, "#1f77b4"), unsafe_allow_html=True)
     # Gráficos
     vendas_por_mes = execute_query("""
         SELECT strftime('%Y-%m', data) AS mes, SUM(quantidade) AS total
@@ -585,6 +601,7 @@ if "logado" not in st.session_state or not st.session_state["logado"]:
     init_db()
     tela_login()
 else:
+    st.set_page_config(layout="wide")
     st.sidebar.title("Sistema de Vendas")
     page = st.sidebar.radio(
         "Navegação",
@@ -613,9 +630,6 @@ else:
     col1, col2 = st.sidebar.columns(2)  # vai separar os botois em duas colunas
 
     with col1:
-        if st.button("Dashboard"):
-            webbrowser.open_new_tab("https://example.com") # aqui voce vai colocar o link do dashboard
-    with col2:
         if st.button("Informações"):
-            webbrowser.open_new_tab("https://example.com") # aqui voce vai colocar o link de algumas informações
+            webbrowser.open_new_tab("https://example.com") # aqui voce vai colocar o link do dashboard
 
